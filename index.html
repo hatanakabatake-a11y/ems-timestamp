@@ -1,1 +1,214 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>救急現場タイムスタンプ</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+  <style>
+    body {
+      font-family: system-ui, sans-serif;
+      margin: 0;
+      padding: 16px;
+      background: #f5f5f5;
+    }
+
+    h1 {
+      font-size: 22px;
+      margin-bottom: 12px;
+    }
+
+    .buttons {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    button {
+      font-size: 18px;
+      padding: 14px;
+      border: none;
+      border-radius: 10px;
+      background: #1976d2;
+      color: white;
+    }
+
+    button.red {
+      background: #d32f2f;
+    }
+
+    button.gray {
+      background: #666;
+    }
+
+    button.green {
+      background: #388e3c;
+    }
+
+    .log {
+      background: white;
+      padding: 12px;
+      border-radius: 10px;
+      margin-bottom: 16px;
+    }
+
+    .log-item {
+      border-bottom: 1px solid #ddd;
+      padding: 8px 0;
+    }
+
+    .log-item:last-child {
+      border-bottom: none;
+    }
+
+    .time {
+      font-weight: bold;
+      margin-right: 8px;
+    }
+
+    textarea {
+      width: 100%;
+      min-height: 70px;
+      font-size: 16px;
+      margin-bottom: 12px;
+    }
+
+    .controls {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+  </style>
+</head>
+
+<body>
+  <h1>救急現場タイムスタンプ</h1>
+
+  <div class="buttons">
+    <button onclick="addStamp('覚知')">覚知</button>
+    <button onclick="addStamp('出動')">出動</button>
+    <button onclick="addStamp('現場到着')">現場到着</button>
+    <button onclick="addStamp('患者接触')">患者接触</button>
+    <button class="red" onclick="addStamp('CPR開始')">CPR開始</button>
+    <button class="red" onclick="addStamp('初回波形確認')">初回波形確認</button>
+    <button onclick="addStamp('AED装着')">AED装着</button>
+    <button onclick="addStamp('静脈路確保')">静脈路確保</button>
+    <button class="red" onclick="addStamp('アドレナリン投与')">アドレナリン投与</button>
+    <button onclick="addStamp('気道確保')">気道確保</button>
+    <button onclick="addStamp('車内収容')">車内収容</button>
+    <button onclick="addStamp('現場出発')">現場出発</button>
+    <button class="green" onclick="addStamp('病院到着')">病院到着</button>
+    <button class="green" onclick="addStamp('医師引継ぎ')">医師引継ぎ</button>
+  </div>
+
+  <h2>記録</h2>
+  <div class="log" id="log"></div>
+
+  <h2>メモ</h2>
+  <textarea id="memo" placeholder="活動メモ、特記事項など"></textarea>
+
+  <div class="controls">
+    <button class="gray" onclick="downloadCSV()">CSV出力</button>
+    <button class="red" onclick="resetLog()">リセット</button>
+  </div>
+
+  <script>
+    let records = [];
+
+    function getCurrentTime() {
+      const now = new Date();
+      const yyyy = now.getFullYear();
+      const mm = String(now.getMonth() + 1).padStart(2, '0');
+      const dd = String(now.getDate()).padStart(2, '0');
+      const hh = String(now.getHours()).padStart(2, '0');
+      const min = String(now.getMinutes()).padStart(2, '0');
+      const sec = String(now.getSeconds()).padStart(2, '0');
+      return `${yyyy}/${mm}/${dd} ${hh}:${min}:${sec}`;
+    }
+
+    function addStamp(label) {
+      const time = getCurrentTime();
+      records.push({ label, time });
+      saveData();
+      renderLog();
+    }
+
+    function renderLog() {
+      const log = document.getElementById('log');
+      log.innerHTML = '';
+
+      if (records.length === 0) {
+        log.innerHTML = '<p>まだ記録はありません。</p>';
+        return;
+      }
+
+      records.forEach((record, index) => {
+        const div = document.createElement('div');
+        div.className = 'log-item';
+        div.innerHTML = `
+          <span class="time">${record.time}</span>
+          <span>${record.label}</span>
+        `;
+        log.appendChild(div);
+      });
+    }
+
+    function saveData() {
+      localStorage.setItem('ems_records', JSON.stringify(records));
+      localStorage.setItem('ems_memo', document.getElementById('memo').value);
+    }
+
+    function loadData() {
+      const savedRecords = localStorage.getItem('ems_records');
+      const savedMemo = localStorage.getItem('ems_memo');
+
+      if (savedRecords) {
+        records = JSON.parse(savedRecords);
+      }
+
+      if (savedMemo) {
+        document.getElementById('memo').value = savedMemo;
+      }
+
+      renderLog();
+    }
+
+    function resetLog() {
+      if (!confirm('記録をすべて削除しますか？')) return;
+
+      records = [];
+      document.getElementById('memo').value = '';
+      localStorage.removeItem('ems_records');
+      localStorage.removeItem('ems_memo');
+      renderLog();
+    }
+
+    function downloadCSV() {
+      const memo = document.getElementById('memo').value;
+
+      let csv = '項目,時刻\n';
+      records.forEach(record => {
+        csv += `"${record.label}","${record.time}"\n`;
+      });
+
+      csv += '\nメモ\n';
+      csv += `"${memo.replace(/"/g, '""')}"\n`;
+
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = '救急現場タイムスタンプ.csv';
+      a.click();
+
+      URL.revokeObjectURL(url);
+    }
+
+    document.getElementById('memo').addEventListener('input', saveData);
+
+    loadData();
+  </script>
+</body>
+</html>
