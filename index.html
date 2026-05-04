@@ -7,15 +7,21 @@
 
   <style>
     body {
-      font-family: system-ui, sans-serif;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
       margin: 0;
       padding: 16px;
       background: #f5f5f5;
+      color: #222;
     }
 
     h1 {
       font-size: 22px;
-      margin-bottom: 12px;
+      margin: 0 0 12px;
+    }
+
+    h2 {
+      font-size: 18px;
+      margin: 20px 0 8px;
     }
 
     .buttons {
@@ -27,11 +33,18 @@
 
     button {
       font-size: 18px;
-      padding: 14px;
+      font-weight: 600;
+      padding: 14px 10px;
       border: none;
       border-radius: 10px;
       background: #1976d2;
       color: white;
+      min-height: 56px;
+    }
+
+    button:active {
+      opacity: 0.75;
+      transform: scale(0.98);
     }
 
     button.red {
@@ -40,10 +53,6 @@
 
     button.gray {
       background: #666;
-    }
-
-    button.green {
-      background: #388e3c;
     }
 
     .log {
@@ -56,6 +65,7 @@
     .log-item {
       border-bottom: 1px solid #ddd;
       padding: 8px 0;
+      font-size: 15px;
     }
 
     .log-item:last-child {
@@ -65,12 +75,18 @@
     .time {
       font-weight: bold;
       margin-right: 8px;
+      display: inline-block;
+      min-width: 150px;
     }
 
     textarea {
+      box-sizing: border-box;
       width: 100%;
-      min-height: 70px;
+      min-height: 80px;
       font-size: 16px;
+      padding: 10px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
       margin-bottom: 12px;
     }
 
@@ -79,27 +95,37 @@
       grid-template-columns: 1fr 1fr;
       gap: 10px;
     }
+
+    .small {
+      font-size: 13px;
+      color: #666;
+      margin-top: -4px;
+      margin-bottom: 12px;
+    }
   </style>
 </head>
 
 <body>
   <h1>救急現場タイムスタンプ</h1>
+  <p class="small">ボタンを押した時点の時刻を記録します。</p>
 
   <div class="buttons">
-    <button onclick="addStamp('覚知')">覚知</button>
-    <button onclick="addStamp('出動')">出動</button>
-    <button onclick="addStamp('現場到着')">現場到着</button>
-    <button onclick="addStamp('患者接触')">患者接触</button>
-    <button class="red" onclick="addStamp('CPR開始')">CPR開始</button>
-    <button class="red" onclick="addStamp('初回波形確認')">初回波形確認</button>
-    <button onclick="addStamp('AED装着')">AED装着</button>
-    <button onclick="addStamp('静脈路確保')">静脈路確保</button>
-    <button class="red" onclick="addStamp('アドレナリン投与')">アドレナリン投与</button>
-    <button onclick="addStamp('気道確保')">気道確保</button>
-    <button onclick="addStamp('車内収容')">車内収容</button>
-    <button onclick="addStamp('現場出発')">現場出発</button>
-    <button class="green" onclick="addStamp('病院到着')">病院到着</button>
-    <button class="green" onclick="addStamp('医師引継ぎ')">医師引継ぎ</button>
+    <button onclick="addStamp('接触')">接触</button>
+    <button onclick="addStamp('初期波形')">初期波形</button>
+    <button onclick="addStamp('1ピリオド')">1ピリオド</button>
+    <button onclick="addStamp('2ピリオド')">2ピリオド</button>
+    <button onclick="addStamp('3ピリオド')">3ピリオド</button>
+    <button onclick="addStamp('4ピリオド')">4ピリオド</button>
+    <button onclick="addStamp('5ピリオド')">5ピリオド</button>
+
+    <button class="red" onclick="addStamp('ROSC')">ROSC</button>
+    <button class="red" onclick="addStamp('アドレナリン')">アドレナリン</button>
+    <button class="red" onclick="addStamp('デバイス')">デバイス</button>
+    <button class="red" onclick="addStamp('挿管')">挿管</button>
+    <button class="red" onclick="addStamp('VF')">VF</button>
+    <button class="red" onclick="addStamp('VT')">VT</button>
+    <button class="red" onclick="addStamp('PEA')">PEA</button>
+    <button class="red" onclick="addStamp('Asystole')">Asystole</button>
   </div>
 
   <h2>記録</h2>
@@ -143,7 +169,7 @@
         return;
       }
 
-      records.forEach((record, index) => {
+      records.forEach((record) => {
         const div = document.createElement('div');
         div.className = 'log-item';
         div.innerHTML = `
@@ -188,6 +214,7 @@
       const memo = document.getElementById('memo').value;
 
       let csv = '項目,時刻\n';
+
       records.forEach(record => {
         csv += `"${record.label}","${record.time}"\n`;
       });
