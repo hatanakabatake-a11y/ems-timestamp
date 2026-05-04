@@ -47,6 +47,18 @@
       transform: scale(0.98);
     }
 
+    button.green {
+      background: #388e3c;
+    }
+
+    button.blue {
+      background: #1976d2;
+    }
+
+    button.purple {
+      background: #7b1fa2;
+    }
+
     button.red {
       background: #d32f2f;
     }
@@ -110,18 +122,21 @@
   <p class="small">ボタンを押した時点の時刻を記録します。</p>
 
   <div class="buttons">
-    <button onclick="addStamp('接触')">接触</button>
-    <button onclick="addStamp('初期波形')">初期波形</button>
-    <button onclick="addStamp('1ピリオド')">1ピリオド</button>
-    <button onclick="addStamp('2ピリオド')">2ピリオド</button>
-    <button onclick="addStamp('3ピリオド')">3ピリオド</button>
-    <button onclick="addStamp('4ピリオド')">4ピリオド</button>
-    <button onclick="addStamp('5ピリオド')">5ピリオド</button>
+    <button class="green" onclick="addStamp('接触')">接触</button>
+    <button class="green" onclick="addStamp('初期波形')">初期波形</button>
 
-    <button class="red" onclick="addStamp('ROSC')">ROSC</button>
-    <button class="red" onclick="addStamp('アドレナリン')">アドレナリン</button>
-    <button class="red" onclick="addStamp('デバイス')">デバイス</button>
-    <button class="red" onclick="addStamp('挿管')">挿管</button>
+    <button class="blue" onclick="addStamp('1ピリオド')">1ピリオド</button>
+    <button class="blue" onclick="addStamp('2ピリオド')">2ピリオド</button>
+    <button class="blue" onclick="addStamp('3ピリオド')">3ピリオド</button>
+    <button class="blue" onclick="addStamp('4ピリオド')">4ピリオド</button>
+    <button class="blue" onclick="addStamp('5ピリオド')">5ピリオド</button>
+    <button class="blue" onclick="addStamp('6ピリオド')">6ピリオド</button>
+
+    <button class="purple" onclick="addStamp('ROSC')">ROSC</button>
+    <button class="purple" onclick="addStamp('アドレナリン')">アドレナリン</button>
+    <button class="purple" onclick="addStamp('デバイス')">デバイス</button>
+    <button class="purple" onclick="addStamp('挿管')">挿管</button>
+
     <button class="red" onclick="addStamp('VF')">VF</button>
     <button class="red" onclick="addStamp('VT')">VT</button>
     <button class="red" onclick="addStamp('PEA')">PEA</button>
